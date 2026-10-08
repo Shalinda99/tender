@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Database (local SQLite)
+*.db
+*.db-journal
+*.sqlite
+prisma/dev.db*
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+
+# Misc
+coverage/
+.cache/
+
+# Internal planning docs (not part of the public repo)
+docs/

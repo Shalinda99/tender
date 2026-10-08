@@ -1,0 +1,125 @@
+// Tender data model.
+// Local dev uses SQLite (zero setup). For Render, switch provider to
+// "postgresql" and point DATABASE_URL at a Render Postgres instance.
+// JSON-shaped fields are stored as stringified JSON for cross-db portability.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Agent {
+  id        String   @id @default(cuid())
+  name      String
+  type      String // buyer | seller | manager
+  owner     String // human owner label
+  persona   String // system-prompt persona / strategy
+  avatar    String? // emoji or url
+  createdAt DateTime @default(now())
+
+  wallet   Wallet?
+  policy   Policy?
+  products Product[] @relation("SellerProducts")
+
+  buyerOffers  Offer[] @relation("BuyerOffers")
+  sellerOffers Offer[] @relation("SellerOffers")
+  events       Event[]
+}
+
+model Wallet {
+  id            String @id @default(cuid())
+  agentId       String @unique
+  agent         Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  paypalRef     String? // sandbox account email / merchant id
+  balanceCached Float   @default(0)
+  currency      String  @default("USD")
+}
+
+model Policy {
+  id                String @id @default(cuid())
+  agentId           String @unique
+  agent             Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  perTxnCap         Float  @default(50)
+  dailyCap          Float  @default(200)
+  categoryAllowList String @default("[]") // JSON array of allowed categories
+  approvalThreshold Float  @default(50) // spend >= this requires human approval
+}
+
+model Product {
+  id            String   @id @default(cuid())
+  sellerAgentId String
+  sellerAgent   Agent    @relation("SellerProducts", fields: [sellerAgentId], references: [id], onDelete: Cascade)
+  title         String
+  price         Float
+  stock         Int      @default(100)
+  category      String
+  metadata      String? // JSON
+  createdAt     DateTime @default(now())
+
+  offers Offer[]
+}
+
+model Offer {
+  id            String   @id @default(cuid())
+  buyerAgentId  String
+  buyerAgent    Agent    @relation("BuyerOffers", fields: [buyerAgentId], references: [id], onDelete: Cascade)
+  sellerAgentId String
+  sellerAgent   Agent    @relation("SellerOffers", fields: [sellerAgentId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  status        String   @default("open") // open | accepted | rejected | expired
+  rounds        String   @default("[]") // JSON array of {actor, price, message, at}
+  createdAt     DateTime @default(now())
+
+  transaction Transaction?
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  offerId   String?  @unique
+  offer     Offer?   @relation(fields: [offerId], references: [id])
+  type      String // order | payout | invoice | subscription
+  paypalRef String? // paypal order/payout/invoice id
+  amount    Float
+  currency  String   @default("USD")
+  status    String   @default("pending") // pending | completed | failed | awaiting_approval
+  buyer     String? // denormalized labels for the grid
+  seller    String?
+  itemLabel String?
+  createdAt DateTime @default(now())
+
+  approval Approval?
+}
+
+model Approval {
+  id            String      @id @default(cuid())
+  transactionId String      @unique
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  status        String      @default("pending") // pending | approved | rejected
+  reason        String?
+  requestedBy   String
+  decidedBy     String?
+  createdAt     DateTime    @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actor     String
+  action    String
+  payload   String // JSON
+  createdAt DateTime @default(now())
+}
+
+model Event {
+  id        String   @id @default(cuid())
+  type      String // negotiation | payment | approval | system
+  agentId   String?
+  agent     Agent?   @relation(fields: [agentId], references: [id])
+  message   String
+  data      String? // JSON
+  createdAt DateTime @default(now())
+}

@@ -1,0 +1,58 @@
+@import "ag-grid-community/styles/ag-grid.css";
+@import "ag-grid-community/styles/ag-theme-quartz.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #0a0c12;
+  color: #e5e7eb;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* AG Grid dark theme tuning */
+.ag-theme-quartz-dark {
+  --ag-background-color: #0f1320;
+  --ag-header-background-color: #161b2e;
+  --ag-odd-row-background-color: #0f1320;
+  --ag-row-hover-color: #1e2540;
+  --ag-border-color: #1e2540;
+  --ag-font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  --ag-foreground-color: #e5e7eb;
+  --ag-accent-color: #3b82f6;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #1e2540;
+  border-radius: 9999px;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade {
+  animation: fadeInUp 0.35s ease-out;
+}

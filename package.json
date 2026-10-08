@@ -1,0 +1,23 @@
+{
+  "name": "tender",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tender — agentic commerce, settled instantly with PayPal.",
+  "license": "MIT",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,client -c cyan,magenta \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "npm run dev --workspace @tender/server",
+    "dev:client": "npm run dev --workspace @tender/client",
+    "build": "npm run build --workspace @tender/server && npm run build --workspace @tender/client",
+    "db:push": "npm run db:push --workspace @tender/server",
+    "db:seed": "npm run db:seed --workspace @tender/server",
+    "demo": "npm run demo --workspace @tender/server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
