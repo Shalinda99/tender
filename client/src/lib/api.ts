@@ -46,7 +46,10 @@ export type Approval = {
   transaction: Transaction;
 };
 
-const BASE = "/api";
+// In production the dashboard is served separately from the API, so it targets
+// the API's absolute URL via VITE_API_BASE (baked at build time). Locally this
+// is unset and the Vite dev proxy forwards "/api" to the server.
+const BASE = ((import.meta as any).env?.VITE_API_BASE as string | undefined)?.replace(/\/$/, "") ?? "/api";
 
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`);

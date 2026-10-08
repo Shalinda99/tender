@@ -9,7 +9,7 @@ import { z } from "zod";
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   DATABASE_URL: z.string().min(1).default("file:./dev.db"),
-  API_PORT: z.coerce.number().int().positive().default(4000),
+  API_PORT: z.coerce.number().int().positive().default(Number(process.env.PORT) || 4000),
   WEB_ORIGIN: z.string().default("http://localhost:5173"),
 
   // PayPal (sandbox). Empty values are allowed — the app falls back to mock mode.
