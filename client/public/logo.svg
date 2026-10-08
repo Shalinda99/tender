@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Tender logo">
+  <defs>
+    <linearGradient id="tenderGradient" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="0.5" stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#a3e635"/>
+    </linearGradient>
+  </defs>
+  <rect x="5" y="5" width="54" height="54" rx="16" fill="#0a0c12"/>
+  <rect x="5" y="5" width="54" height="54" rx="16" fill="none" stroke="url(#tenderGradient)" stroke-width="4"/>
+  <g fill="none" stroke="url(#tenderGradient)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19 21 H45"/>
+    <path d="M32 21 V40 Q32 46 38 46 H43"/>
+    <path d="M23 21 V31"/>
+  </g>
+</svg>

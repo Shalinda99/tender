@@ -90,9 +90,7 @@ export default function App() {
       <header className="sticky top-0 z-40 border-b border-ink-700 bg-ink-900/80 backdrop-blur">
         <div className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-tender-lime text-lg font-black text-ink-950">
-              T
-            </div>
+            <img src="/logo.svg" alt="Tender" className="h-9 w-9" />
             <div>
               <h1 className="text-lg font-bold tracking-tight text-white">Tender</h1>
               <p className="-mt-1 text-xs text-slate-500">Agentic commerce, settled with PayPal</p>
