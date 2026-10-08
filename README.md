@@ -12,21 +12,44 @@ real-time command center built on AG Grid.
 
 ---
 
-## Why this wins
+## The problem
 
-Tender is engineered to compete for the maximum number of prizes in the
-**Build What's Next with PayPal and AI** hackathon:
+AI agents are increasingly able to decide _what_ to buy — but they have no safe
+way to actually _pay_ for it. Two gaps block real "agentic commerce":
 
-| Prize | How Tender targets it |
-| --- | --- |
-| Best Use of Agentic Commerce ($5k) | Literal agent-to-agent negotiation + autonomous settlement |
-| Best Use of PayPal + AI ($5k) | PayPal is the settlement backbone; AI drives every action |
-| Best Use of AG Grid ($5k / $2k / $1k) | Real-time financial command center built on AG Grid |
-| Most Impactful ($5k) | Automates cashflow for freelancers & small businesses |
-| Most Creative ($5k) | A marketplace where AI agents transact with each other |
-| Best Demo Delivery ($5k) | Watch money move between autonomous agents live |
-| Best Use of Render | Deployed end-to-end on Render |
-| Overall 1st–3rd ($25k) | Ambitious, polished, production-ready execution |
+- **No trusted settlement rail.** Letting an autonomous agent touch a raw payment
+  API or a shared card is risky and hard to audit.
+- **No guardrails or human oversight.** Without spend caps, approvals, and a full
+  audit trail, no business can let software move money on its behalf.
+
+## Our solution
+
+Tender gives every person or business an **AI agent with its own
+PayPal-backed wallet** and a policy that defines what it is allowed to do.
+Agents then:
+
+- **Discover** needs and products in a shared marketplace.
+- **Negotiate** price agent-to-agent (an LLM haggles in character, while
+  code-level guardrails enforce each side's budget floor/ceiling).
+- **Settle** the agreed amount automatically through **PayPal**.
+- **Stay under control** — any spend above a configurable threshold is paused for
+  **human approval**, every action is logged, and spend caps are enforced per
+  transaction and per day.
+
+Everything is supervised from a **real-time command center** built on AG Grid:
+a live ledger of transactions, a streaming activity feed, an approvals queue,
+and spend analytics.
+
+## Business value
+
+- **For small businesses & freelancers** — automates cashflow: agents invoice
+  clients and split revenue to subcontractors the moment a client pays.
+- **For households & buyers** — an agent shops within a set budget, negotiates
+  the best price, and only interrupts a human for larger purchases.
+- **For PayPal** — positions PayPal as the **settlement backbone of the emerging
+  agent economy**, where software, not just people, initiates payments.
+- **Trust by design** — guardrails, human-in-the-loop approvals, and an audit
+  trail make autonomous spend something a business can actually adopt.
 
 ## Project structure
 
@@ -95,23 +118,12 @@ npm run dev
 
 > Prefer separate terminals? Run `npm run dev:server` and `npm run dev:client`.
 
-### 5. Try it
-
-Open the dashboard and click **Run Shopping Agent**, **Run Big Purchase**
-(triggers a human approval), or **Run Freelancer Agent** to watch AI agents
-negotiate and settle via PayPal, live in the AG Grid ledger.
-
-> **Live payouts need a funded sandbox account.** PayPal payouts are sent from the
-> sandbox business account that owns your app; give it a balance under
-> **Testing Tools → Sandbox Accounts**, or payouts return `DENIED (insufficient
-> funds)`. Mock mode has no such requirement.
-
-## The 60-second pitch
-
-Today, humans click "buy." Tomorrow, agents will. Tender is the infrastructure
-for that world: autonomous AI agents that earn, spend, and settle money safely
-on your behalf — with PayPal handling every transaction and humans staying in
-control through approvals, spend caps, and a full audit trail.
+Once both apps are running, use the dashboard controls to trigger the shopping,
+big-purchase (human approval), and freelancer settlement flows. In **mock mode**
+this works with no API keys; in **live mode** PayPal payouts are sent from the
+sandbox business account that owns your app, so give it a balance under
+**Testing Tools → Sandbox Accounts** or payouts return `DENIED (insufficient
+funds)`.
 
 ## License
 
