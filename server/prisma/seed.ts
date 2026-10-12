@@ -87,6 +87,88 @@ async function main() {
     },
   });
 
+  // ── High-value buyer: a family-office concierge that acquires land & cars ──
+  const concierge = await prisma.agent.create({
+    data: {
+      name: "Acquisitions Concierge",
+      type: "buyer",
+      owner: "Halcyon Family Office",
+      avatar: "\uD83E\uDDED",
+      persona:
+        "You are a shrewd acquisitions agent for a family office buying real estate and vehicles. " +
+        "You are pre-approved for financing, know market comparables cold, and negotiate like a seasoned " +
+        "human dealmaker — anchoring low, justifying every counter, and conceding slowly. You never overpay " +
+        "and you escalate any large commitment to your principals for sign-off.",
+      wallet: { create: { paypalRef: "sb-ycwwq53248932@personal.example.com", balanceCached: 2_000_000 } },
+      policy: {
+        create: {
+          perTxnCap: 2_000_000,
+          dailyCap: 10_000_000,
+          approvalThreshold: 10_000, // any land/car buy needs principal sign-off
+          categoryAllowList: JSON.stringify(["real-estate", "automotive"]),
+        },
+      },
+    },
+  });
+
+  // ── Land sellers ──────────────────────────────────────────
+  const landTrust = await prisma.agent.create({
+    data: {
+      name: "LandTrust Estates",
+      type: "seller",
+      owner: "LandTrust Estates LLC",
+      avatar: "\uD83C\uDFE1",
+      persona:
+        "You are a premium land broker agent. You open near list, defend value with facts (clean title, " +
+        "zoning, lake frontage, build-readiness), and will discount to a hidden floor to close a serious buyer.",
+      wallet: { create: { paypalRef: "sb-ycwwq53248932@personal.example.com", balanceCached: 0 } },
+      policy: { create: { perTxnCap: 10_000_000, dailyCap: 10_000_000, approvalThreshold: 10_000_000 } },
+    },
+  });
+
+  const prestige = await prisma.agent.create({
+    data: {
+      name: "Prestige Properties",
+      type: "seller",
+      owner: "Prestige Properties Group",
+      avatar: "\uD83C\uDFD9\uFE0F",
+      persona:
+        "You are a competing land broker agent. You price slightly under rivals to win the deal while " +
+        "protecting a thin margin above your hidden floor.",
+      wallet: { create: { paypalRef: "sb-ycwwq53248932@personal.example.com", balanceCached: 0 } },
+      policy: { create: { perTxnCap: 10_000_000, dailyCap: 10_000_000, approvalThreshold: 10_000_000 } },
+    },
+  });
+
+  // ── Car sellers ───────────────────────────────────────────
+  const autoSphere = await prisma.agent.create({
+    data: {
+      name: "AutoSphere Motors",
+      type: "seller",
+      owner: "AutoSphere Motors Inc.",
+      avatar: "\uD83D\uDE97",
+      persona:
+        "You are a car dealership agent. You justify price with low mileage, full service history and " +
+        "warranty, and negotiate down to a hidden floor to move inventory.",
+      wallet: { create: { paypalRef: "sb-ycwwq53248932@personal.example.com", balanceCached: 0 } },
+      policy: { create: { perTxnCap: 10_000_000, dailyCap: 10_000_000, approvalThreshold: 10_000_000 } },
+    },
+  });
+
+  const driveLine = await prisma.agent.create({
+    data: {
+      name: "DriveLine Auto",
+      type: "seller",
+      owner: "DriveLine Auto Group",
+      avatar: "\uD83C\uDFCE\uFE0F",
+      persona:
+        "You are a competing car dealership agent. You undercut rivals on price to win the sale while " +
+        "protecting a slim margin above your hidden floor.",
+      wallet: { create: { paypalRef: "sb-ycwwq53248932@personal.example.com", balanceCached: 0 } },
+      policy: { create: { perTxnCap: 10_000_000, dailyCap: 10_000_000, approvalThreshold: 10_000_000 } },
+    },
+  });
+
   // ── Products (per seller) ───────────────────────────────
   const catalog: Array<[string, string, number, number, string]> = [
     // title, category, price, stock, floorMeta
@@ -113,6 +195,53 @@ async function main() {
           price: Math.max(1, price + jitter),
           stock,
           metadata: JSON.stringify({ floor: Number(floor) + jitter }),
+        },
+      });
+    }
+  }
+
+  // ── High-value catalogs: land & cars (per competing seller) ──
+  const realEstate: Array<[string, string, number, number, string]> = [
+    // title, category, list price, stock, hidden floor
+    ["Lakeview Residential Lot (0.5 acre)", "real-estate", 120000, 3, "96000"],
+    ["Hillside Building Plot (1 acre)", "real-estate", 185000, 2, "150000"],
+    ["Downtown Commercial Parcel", "real-estate", 450000, 1, "385000"],
+  ];
+  const automotive: Array<[string, string, number, number, string]> = [
+    ["Tesla Model 3 Long Range", "automotive", 42000, 6, "36000"],
+    ["Toyota Land Cruiser", "automotive", 85000, 4, "72000"],
+    ["Mercedes-Benz E-Class", "automotive", 66000, 5, "56000"],
+  ];
+
+  // Land: LandTrust opens at list, Prestige undercuts ~3%.
+  for (const seller of [landTrust, prestige]) {
+    for (const [title, category, price, stock, floor] of realEstate) {
+      const discount = seller.id === prestige.id ? 0.97 : 1;
+      await prisma.product.create({
+        data: {
+          sellerAgentId: seller.id,
+          title,
+          category,
+          price: Math.round(price * discount),
+          stock,
+          metadata: JSON.stringify({ floor: Math.round(Number(floor) * discount) }),
+        },
+      });
+    }
+  }
+
+  // Cars: AutoSphere opens at list, DriveLine undercuts ~3%.
+  for (const seller of [autoSphere, driveLine]) {
+    for (const [title, category, price, stock, floor] of automotive) {
+      const discount = seller.id === driveLine.id ? 0.97 : 1;
+      await prisma.product.create({
+        data: {
+          sellerAgentId: seller.id,
+          title,
+          category,
+          price: Math.round(price * discount),
+          stock,
+          metadata: JSON.stringify({ floor: Math.round(Number(floor) * discount) }),
         },
       });
     }

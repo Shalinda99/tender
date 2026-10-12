@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ShoppingCart, Briefcase, Activity, CircleDollarSign, ShieldAlert } from "lucide-react";
+import { ShoppingCart, Briefcase, Activity, CircleDollarSign, ShieldAlert, Landmark, Car } from "lucide-react";
 import { api, type Agent, type Transaction, type TenderEvent, type Approval } from "./lib/api";
 import AgentRail from "./components/AgentRail";
 import TransactionsGrid from "./components/TransactionsGrid";
@@ -119,6 +119,20 @@ export default function App() {
               className="flex items-center gap-2 rounded-lg bg-fuchsia-600/90 px-4 py-2 text-sm font-semibold text-white transition hover:bg-fuchsia-500 disabled:opacity-50"
             >
               <ShieldAlert className="h-4 w-4" /> Run Big Purchase
+            </button>
+            <button
+              onClick={() => runShopping("real-estate")}
+              disabled={busy}
+              className="flex items-center gap-2 rounded-lg bg-emerald-600/90 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:opacity-50"
+            >
+              <Landmark className="h-4 w-4" /> Buy Land
+            </button>
+            <button
+              onClick={() => runShopping("automotive")}
+              disabled={busy}
+              className="flex items-center gap-2 rounded-lg bg-sky-600/90 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-500 disabled:opacity-50"
+            >
+              <Car className="h-4 w-4" /> Buy a Car
             </button>
             <button
               onClick={() => runFreelancer()}

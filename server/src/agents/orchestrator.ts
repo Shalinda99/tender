@@ -15,16 +15,23 @@ export async function runShoppingScenario(opts?: { category?: string; pace?: num
   const pace = opts?.pace ?? 600;
   const category = opts?.category ?? "groceries";
 
-  const butler = await prisma.agent.findFirst({
+  // Pick the buyer whose policy is scoped to this category (falls back to the
+  // first buyer). This routes groceries/appliances to the household butler and
+  // real-estate/automotive to the high-value acquisitions concierge.
+  const buyers = await prisma.agent.findMany({
     where: { type: "buyer" },
     include: { policy: true },
   });
+  const butler =
+    buyers.find((b) =>
+      json.parse<string[]>(b.policy?.categoryAllowList ?? null, []).includes(category)
+    ) ?? buyers[0];
   if (!butler || !butler.policy) throw new Error("No buyer agent seeded.");
 
   await emitEvent({
     type: "system",
     agentId: butler.id,
-    message: `${butler.name} detected a ${category} restock need (budget cap $${butler.policy.perTxnCap}/item).`,
+    message: `${butler.name} is sourcing ${category} — comparing offers from competing agents...`,
   });
   await sleep(pace);
 
@@ -73,6 +80,9 @@ export async function runShoppingScenario(opts?: { category?: string; pace?: num
       buyerCeiling,
       sellerFloor: floor,
       item: product.title,
+      category: product.category,
+      buyerName: butler.name,
+      sellerName: product.sellerAgent.name,
       buyerPersona: butler.persona,
       sellerPersona: product.sellerAgent.persona,
     };
