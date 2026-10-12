@@ -159,17 +159,17 @@ export default function App() {
 
         {/* Main grid */}
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-          <section className="xl:col-span-2 rounded-xl border border-ink-700 bg-ink-900">
+          <section className="flex h-[520px] flex-col rounded-xl border border-ink-700 bg-ink-900 xl:col-span-2">
             <div className="flex items-center justify-between border-b border-ink-700 px-4 py-3">
               <h2 className="text-sm font-semibold text-slate-200">Transaction Ledger</h2>
               <span className="text-xs text-slate-500">click a row for negotiation detail</span>
             </div>
-            <div className="h-[460px] p-2">
+            <div className="min-h-0 flex-1 p-2">
               <TransactionsGrid rows={transactions} onSelect={setSelected} />
             </div>
           </section>
 
-          <section className="rounded-xl border border-ink-700 bg-ink-900">
+          <section className="h-[520px] rounded-xl border border-ink-700 bg-ink-900">
             <ActivityFeed events={events} />
           </section>
         </div>
