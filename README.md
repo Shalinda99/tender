@@ -10,6 +10,21 @@ real-time command center built on AG Grid.
 > _Legal **tender** (money) + to **tender** an offer (what agents do when they
 > negotiate and buy). One word, the whole product._
 
+**Live demo:** https://tender-web-686i.onrender.com ·
+**API:** https://tender-api-dtv0.onrender.com/health
+
+> The hosted demo runs on Render's free tier, so the first request after a period
+> of inactivity can take about a minute while the API wakes up.
+
+---
+
+## Contents
+
+[Problem](#the-problem) · [Solution](#our-solution) · [Features](#features) ·
+[Business value](#business-value) · [Tech stack](#tech-stack) ·
+[Run locally](#run-it-locally) · [Configuration](#configuration) ·
+[Deploy](#deploy-to-render) · [License](#license)
+
 ---
 
 ## The problem
@@ -40,14 +55,33 @@ Everything is supervised from a **real-time command center** built on AG Grid:
 a live ledger of transactions, a streaming activity feed, an approvals queue,
 and spend analytics.
 
+## Features
+
+- **Autonomous shopping** — a buyer agent contacts competing sellers, negotiates
+  with each, and settles with the cheapest offer.
+- **Big-ticket negotiation** — an acquisitions agent haggles with two land
+  brokers or two car dealers over several rounds, using category-specific
+  arguments (title, zoning and frontage for land; mileage and warranty for cars).
+- **Policy guardrails** — per-transaction cap, daily cap, category allow-list and
+  an approval threshold on every agent.
+- **Human approval** — purchases above the threshold wait in an approvals queue
+  and no money moves until a person approves.
+- **Revenue splitting** — a manager agent is paid, then pays its subcontractors in
+  one PayPal Payouts batch.
+- **Real-time dashboard** — 9 seeded agents, a live ledger (AG Grid), a streaming
+  activity feed over Server-Sent Events, and spend analytics. Each deal opens into
+  its full negotiation transcript.
+- **Mock or live PayPal** — one switch (`TENDER_MODE`) toggles between fake IDs and
+  the real PayPal sandbox.
+
 ## Business value
 
 - **For small businesses & freelancers** — automates cashflow: agents invoice
   clients and split revenue to subcontractors the moment a client pays.
 - **For households & buyers** — an agent shops within a set budget, negotiates
   the best price, and only interrupts a human for larger purchases.
-- **For PayPal** — positions PayPal as the **settlement backbone of the emerging
-  agent economy**, where software, not just people, initiates payments.
+- **For marketplaces** — settle sellers automatically through PayPal Payouts as
+  soon as a deal closes.
 - **Trust by design** — guardrails, human-in-the-loop approvals, and an audit
   trail make autonomous spend something a business can actually adopt.
 
@@ -125,6 +159,52 @@ sandbox business account that owns your app, so give it a balance under
 **Testing Tools → Sandbox Accounts** or payouts return `DENIED (insufficient
 funds)`.
 
+## Configuration
+
+All settings live in `server/.env` (copy from `server/.env.example`).
+
+| Variable | Purpose | Default |
+| --- | --- | --- |
+| `TENDER_MODE` | `mock` (no PayPal calls) or `live` (PayPal sandbox) | `mock` |
+| `PAYPAL_CLIENT_ID` / `PAYPAL_CLIENT_SECRET` | PayPal sandbox app credentials | empty |
+| `PAYPAL_BASE_URL` | PayPal API base URL | `https://api-m.sandbox.paypal.com` |
+| `LLM_PROVIDER` | `groq`, `openrouter` or `none` (deterministic negotiation) | `groq` in the example file |
+| `GROQ_API_KEY` / `OPENROUTER_API_KEY` | LLM provider key | empty |
+| `LLM_MODEL` | Model name for the chosen provider | `openai/gpt-oss-20b` (Groq) |
+| `DATABASE_URL` | Prisma database URL | `file:./dev.db` (SQLite) |
+| `API_PORT` | API port | `4000` |
+| `WEB_ORIGIN` | Allowed CORS origin for the dashboard | `http://localhost:5173` |
+
+The client reads `VITE_API_BASE` at build time to find the API.
+
+## Deploy to Render
+
+`render.yaml` is a Render Blueprint that creates two free services:
+
+- **`tender-api`** — Node + Express API (SQLite, re-seeded on each deploy)
+- **`tender-web`** — static React/Vite dashboard
+
+1. Push the repo to GitHub.
+2. In Render choose **New + → Blueprint**, select the repository and click **Apply**.
+3. When `tender-api` is **Live**, check `https://<your-api>.onrender.com/health`.
+4. On `tender-web`, set `VITE_API_BASE` to the API URL (no trailing slash) and
+   redeploy so it is compiled into the build.
+5. Optional: set `WEB_ORIGIN` on `tender-api` to your dashboard URL to restrict CORS.
+6. Optional: to use real PayPal and an LLM, set `TENDER_MODE=live`, the PayPal
+   credentials, `LLM_PROVIDER=groq` and `GROQ_API_KEY` on `tender-api`.
+
+**Free-tier notes:** services sleep after about 15 minutes idle and take around
+50 seconds to wake. SQLite data resets on each restart or deploy.
+
+**Troubleshooting**
+
+| Symptom | Fix |
+| --- | --- |
+| Dashboard shows no data or network errors | `VITE_API_BASE` is missing or wrong; set it and redeploy `tender-web`. |
+| CORS errors in the browser console | Set `WEB_ORIGIN` to `*` or your exact dashboard URL, then redeploy the API. |
+| `/health` returns 404 | The API is still building, or you opened the web URL instead of the API URL. |
+| Live payouts return `DENIED (insufficient funds)` | Add a balance to the sandbox business account under **Testing Tools → Sandbox Accounts**. |
+
 ## License
 
-MIT — see [`LICENSE`](LICENSE). (Required by the hackathon: public + open source.)
+MIT — see [`LICENSE`](LICENSE).

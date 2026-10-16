@@ -32,5 +32,9 @@ npm-debug.log*
 coverage/
 .cache/
 
+# Local demo/design tooling and media
+demo-video/
+.superdesign/
+
 # Internal planning docs (not part of the public repo)
 docs/
